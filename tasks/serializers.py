@@ -10,12 +10,21 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'description', 'assigned_to', 'assigned_to_username', 'status', 'due_date', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at', 'assigned_to_username']
     
-    def validate_title(self, value):
-        if not value or not value.strip():
-            raise serializers.ValidationError("Title is required.")
-        return value
+    def validate(self, data):
+        if 'title' not in data or not data['title'].strip():
+            raise serializers.ValidationError({"title": "Title is required."})
+        return data
 
-class UserSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+        fields = ['username', 'password']
+    
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password']
+        )
+        return user
