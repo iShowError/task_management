@@ -2,9 +2,15 @@ from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from .models import Task
-from .serializers import TaskSerializer, UserRegistrationSerializer
+from .serializers import TaskSerializer, UserRegistrationSerializer, UserListSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.viewsets import ReadOnlyModelViewSet
+
+class UserViewSet(ReadOnlyModelViewSet):
+    queryset = User.objects.all().order_by('id')
+    serializer_class = UserListSerializer 
+    permission_classes = [IsAuthenticated]
 
 class UserRegistrationView(generics.CreateAPIView):
     #API endpoint for user registration
@@ -21,7 +27,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Task.objects.filter(assigned_to=user)
         
     def perform_create(self, serializer):
-        serializer.save(assigned_to=self.request.user)
+        serializer.save()
     
     def perform_update(self, serializer):
         if serializer.instance.assigned_to == self.request.user:
