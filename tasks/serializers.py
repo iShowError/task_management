@@ -2,6 +2,11 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Task
 
+class UserListSerializer(serializers.ModelSerializer):
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name'] 
+        read_only_fields = ['id', 'username', 'first_name', 'last_name']
+
 class TaskSerializer(serializers.ModelSerializer):
     assigned_to_username = serializers.CharField(source='assigned_to.username', read_only=True)
     
