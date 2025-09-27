@@ -71,12 +71,17 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = 'static/'
 
+from rest_framework.authentication import TokenAuthentication
+class CustomTokenAuthentication(TokenAuthentication):
+    keyword = 'Bearer'
+
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'task_management.settings.CustomTokenAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
