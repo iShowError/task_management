@@ -17,6 +17,10 @@ class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [] 
 
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+        return Response({'message': 'User successfully registered'}, status=status.HTTP_201_CREATED)
+
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
