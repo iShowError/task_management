@@ -50,3 +50,8 @@ class TaskViewSet(viewsets.ModelViewSet):
             instance.delete()
         else:
             raise PermissionDenied("Only the task creator can delete this task.")
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({'message': 'Task deleted successfully'}, status=status.HTTP_200_OK)
