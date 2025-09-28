@@ -43,7 +43,10 @@ class TaskViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("You do not have permission to edit this task.")
 
     def perform_destroy(self, instance):
-        if instance.created_by == self.request.user:
+        user = self.request.user
+        if not instance.created_by:
+            raise PermissionDenied("This task has no creator and cannot be deleted.")
+        elif instance.created_by == user:
             instance.delete()
         else:
-            raise PermissionDenied("You do not have permission to delete this task.")
+            raise PermissionDenied("Only the task creator can delete this task.")
