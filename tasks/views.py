@@ -6,6 +6,7 @@ from .serializers import TaskSerializer, UserRegistrationSerializer, UserListSer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from django.db import models
 
 class UserViewSet(ReadOnlyModelViewSet):
     queryset = User.objects.all().order_by('id')
@@ -28,19 +29,21 @@ class TaskViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(assigned_to=user)
+        return Task.objects.filter(models.Q(assigned_to=user) | models.Q(created_by=user)).distinct()
         
     def perform_create(self, serializer):
-        serializer.save()
+        serializer.save(created_by=self.request.user)
     
     def perform_update(self, serializer):
-        if serializer.instance.assigned_to == self.request.user:
+        task = serializer.instance
+        user = self.request.user
+        if task.created_by == user or task.assigned_to == user:
             serializer.save()
         else:
             raise PermissionDenied("You do not have permission to edit this task.")
 
     def perform_destroy(self, instance):
-        if instance.assigned_to == self.request.user:
+        if instance.created_by == self.request.user:
             instance.delete()
         else:
             raise PermissionDenied("You do not have permission to delete this task.")

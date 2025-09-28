@@ -11,11 +11,12 @@ class UserListSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     assigned_to_username = serializers.CharField(source='assigned_to.username', read_only=True)
     assigned_to = serializers.CharField(write_only=True)
+    created_by_username = serializers.CharField(source='created_by.username', read_only=True)
     
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description', 'assigned_to', 'assigned_to_username', 'status', 'due_date', 'created_at', 'updated_at']
-        read_only_fields = ['created_at', 'updated_at', 'assigned_to_username']
+        fields = ['id', 'title', 'description', 'assigned_to', 'assigned_to_username', 'status', 'due_date', 'created_at', 'updated_at', 'created_by_username']
+        read_only_fields = ['created_at', 'updated_at', 'assigned_to_username', 'created_by_username']
     
     def validate(self, data):
         if 'title' not in data or not data['title'].strip():
