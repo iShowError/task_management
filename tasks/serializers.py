@@ -32,8 +32,6 @@ class TaskSerializer(serializers.ModelSerializer):
                 'created_by': 'Task creator cannot be changed after creation.',
                 'created_at': 'Creation timestamp is automatically set and cannot be modified.',
                 'updated_at': 'Update timestamp is automatically managed by the system.',
-                'created_by_username': 'This is a read-only field derived from the task creator.',
-                'assigned_to_username': 'This is a read-only field derived from the assigned user.'
             }
             
             for field in forbidden_fields:
