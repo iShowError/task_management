@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from django.db import models
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
 
 class UserViewSet(ReadOnlyModelViewSet):
     queryset = User.objects.all().order_by('id')
@@ -21,6 +23,26 @@ class UserRegistrationView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
         return Response({'message': 'User successfully registered'}, status=status.HTTP_201_CREATED)
+
+class UserLogoutView(APIView):
+    #endpoint for user logout
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            # Get the user's token and delete it
+            token = Token.objects.get(user=request.user)
+            token.delete()
+            return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+        except Token.DoesNotExist:
+            # Handle case where token doesn't exist (already deleted)
+            return Response({'message': 'You are already logged out'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            # Handle any other unexpected errors
+            return Response(
+                {'error': 'An error occurred during logout. Please try again.'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
